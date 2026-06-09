@@ -1,7 +1,8 @@
 // src/components/Layout.tsx
 import React from 'react';
-import { LayoutDashboard, PlusCircle, BarChart3, Droplets } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, BarChart3, Droplets, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { auth } from '../utils/auth';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -22,9 +23,13 @@ const Layout: React.FC<LayoutProps> = ({ children, titulo }) => {
               <Droplets className="text-white fill-white" size={24} />
               <h1 className="text-xl font-black tracking-tight">MOTO CLEAN</h1>
             </div>
-            <div className="bg-white/20 backdrop-blur-md p-2 rounded-full">
-              <div className="w-2 h-2 bg-green-400 rounded-full shadow-[0_0_8px_rgba(74,222,128,0.8)]"></div>
-            </div>
+            <button
+              onClick={() => { auth.logout(); navigate('/login'); }}
+              className="bg-white/20 backdrop-blur-md p-2 rounded-full hover:bg-white/30 transition-colors"
+              title="Cerrar sesión"
+            >
+              <LogOut size={18} className="text-white" />
+            </button>
           </div>
           <h2 className="text-3xl font-bold mt-2">{titulo}</h2>
         </div>
