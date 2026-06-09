@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://lavadero-application-web.onrender.com"
+      "destination": "https://lavadero-application-web.onrender.com/api/:path*"
     }
   ]
 }
