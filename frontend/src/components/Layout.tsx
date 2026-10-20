@@ -4,12 +4,17 @@ import { LayoutDashboard, PlusCircle, BarChart3, Droplets, LogOut } from 'lucide
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../utils/auth';
 
+export type Seccion = 'registro' | 'lista' | 'stats';
+
 interface LayoutProps {
   children: React.ReactNode;
   titulo: string;
+  seccion: Seccion;
+  onSeccion: (s: Seccion) => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, titulo }) => {
+const Layout: React.FC<LayoutProps> = ({ children, titulo, seccion, onSeccion }) => {
+  const color = (s: Seccion) => seccion === s ? 'text-sky-600' : 'text-slate-400 hover:text-sky-500';
   const navigate = useNavigate();
   return (
     // Fondo azul muy claro para toda la app
@@ -44,19 +49,25 @@ const Layout: React.FC<LayoutProps> = ({ children, titulo }) => {
       <div className="fixed bottom-6 left-0 right-0 px-6 z-50">
         <nav className="max-w-md mx-auto bg-white/90 backdrop-blur-lg border border-sky-100 h-16 rounded-2xl shadow-2xl flex justify-around items-center px-4">
           <button 
-            onClick={() => navigate('/')} // Volver al Home informativo
-            className="flex flex-col items-center text-sky-600"
+            onClick={() => onSeccion('lista')} // Listado de motos del día
+            className={`flex flex-col items-center transition-colors ${color('lista')}`}
           >
             <LayoutDashboard size={24} />
             <span className="text-[10px] font-bold uppercase">Inicio</span>
           </button>
 
           {/* Botón Central de Acción */}
-          <button className="bg-blue-600 text-white p-4 rounded-xl shadow-lg shadow-blue-200 -mt-12 border-4 border-sky-50 active:scale-90 transition-all">
+          <button
+            onClick={() => onSeccion('registro')}
+            title="Nueva entrada"
+            className="bg-blue-600 text-white p-4 rounded-xl shadow-lg shadow-blue-200 -mt-12 border-4 border-sky-50 active:scale-90 transition-all">
             <PlusCircle size={28} />
           </button>
 
-          <button className="flex flex-col items-center text-slate-400 hover:text-sky-500 transition-colors">
+          <button
+            onClick={() => onSeccion('stats')}
+            className={`flex flex-col items-center transition-colors ${color('stats')}`}
+          >
             <BarChart3 size={24} />
             <span className="text-[10px] font-bold uppercase tracking-wider">Stats</span>
           </button>

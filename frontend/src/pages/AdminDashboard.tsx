@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import Layout from '../components/Layout';
+import Layout, { type Seccion } from '../components/Layout';
 import RegistroMoto from '../components/admin/RegistroMoto';
 import ListaMotos from '../components/admin/ListaMotos';
 import Estadisticas from '../components/admin/Estadisticas';
 import { ClipboardList, List, PieChart } from 'lucide-react';
 
 const AdminDashboard: React.FC = () => {
-  const [seccion, setSeccion] = useState<'registro' | 'lista' | 'stats'>('registro');
+  const [seccion, setSeccion] = useState<Seccion>('registro');
 
   return (
-    <Layout titulo={seccion === 'registro' ? 'Nueva Entrada' : seccion === 'lista' ? 'Historial' : 'Reportes'}>
+    <Layout seccion={seccion} onSeccion={setSeccion} titulo={seccion === 'registro' ? 'Nueva Entrada' : seccion === 'lista' ? 'Historial' : 'Reportes'}>
       
       {/* Selector de Secciones (Tabs) */}
       <div className="flex bg-white p-1 rounded-2xl shadow-sm border border-sky-100 mb-6">
