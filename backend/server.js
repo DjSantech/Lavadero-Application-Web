@@ -5,6 +5,7 @@ const helmet = require('helmet');
 require('dotenv').config();
 
 const app = express();
+app.set('trust proxy', 1); // Render/Vercel van detrás de proxy
 
 // Middlewares
 app.use(helmet());
@@ -17,6 +18,7 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error('❌ Error de conexión:', err));
 
 // Rutas
+app.use('/api/auth', require('./routes/auth'));
 app.use('/api/tickets', require('./routes/tickets'));
 
 const PORT = process.env.PORT || 5000;

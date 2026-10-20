@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Droplets, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Droplets, Lock, User, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { auth } from '../utils/auth';
-
-const USUARIO = 'toño2005';
-const CLAVE = 'toño1234';
+import { authApi } from '../services/api';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -12,14 +10,19 @@ const Login: React.FC = () => {
   const [clave, setClave] = useState('');
   const [mostrarClave, setMostrarClave] = useState(false);
   const [error, setError] = useState('');
+  const [cargando, setCargando] = useState(false);
 
-  const handleSubmit = (e: React.SyntheticEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    if (usuario === USUARIO && clave === CLAVE) {
-      auth.login();
+    setCargando(true);
+    try {
+      const { token } = await authApi.login(usuario, clave);
+      auth.login(token);
       navigate('/admin');
-    } else {
-      setError('Usuario o contraseña incorrectos.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo iniciar sesión.');
+    } finally {
+      setCargando(false);
     }
   };
 
@@ -89,9 +92,10 @@ const Login: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-base shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all"
+            disabled={cargando}
+            className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-base shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all flex justify-center items-center gap-2 disabled:opacity-60"
           >
-            Entrar
+            {cargando ? <><Loader2 size={18} className="animate-spin" /> Entrando...</> : 'Entrar'}
           </button>
         </form>
 

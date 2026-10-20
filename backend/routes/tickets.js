@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Ticket = require('../models/Tickets');
+const { requireAuth } = require('../middleware/auth');
 
 // GET /api/tickets/stats — estadísticas reales (debe ir ANTES de /:id)
-router.get('/stats', async (req, res) => {
+router.get('/stats', requireAuth, async (req, res) => {
   try {
     const ahora = new Date();
     const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
@@ -73,7 +74,8 @@ router.get('/buscar', async (req, res) => {
     const { placa } = req.query;
     if (!placa) return res.status(400).json({ error: 'Placa requerida' });
 
-    const regex = new RegExp(`^${placa.trim()}$`, 'i');
+    const placaSegura = String(placa).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`^${placaSegura}$`, 'i');
 
     // Prioridad: ticket activo (no entregado) más reciente
     let ticket = await Ticket.findOne({ placa: regex, estado: { $ne: 'entregado' } }).sort({ fecha: -1 });
@@ -92,7 +94,7 @@ router.get('/buscar', async (req, res) => {
 });
 
 // GET /api/tickets — listar con filtro opcional por periodo
-router.get('/', async (req, res) => {
+router.get('/', requireAuth, async (req, res) => {
   try {
     const { periodo } = req.query;
     const ahora = new Date();
@@ -120,7 +122,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/tickets — crear nuevo ingreso
-router.post('/', async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
   try {
     const ticket = new Ticket(req.body);
     const saved = await ticket.save();
@@ -131,12 +133,12 @@ router.post('/', async (req, res) => {
 });
 
 // PATCH /api/tickets/:id/estado — actualizar estado
-router.patch('/:id/estado', async (req, res) => {
+router.patch('/:id/estado', requireAuth, async (req, res) => {
   try {
     const ticket = await Ticket.findByIdAndUpdate(
       req.params.id,
       { estado: req.body.estado },
-      { new: true }
+      { new: true, runValidators: true }
     );
     if (!ticket) return res.status(404).json({ error: 'Ticket no encontrado' });
     res.json(ticket);
@@ -146,7 +148,7 @@ router.patch('/:id/estado', async (req, res) => {
 });
 
 // DELETE /api/tickets/:id — eliminar
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
   try {
     await Ticket.findByIdAndDelete(req.params.id);
     res.json({ message: 'Ticket eliminado' });
